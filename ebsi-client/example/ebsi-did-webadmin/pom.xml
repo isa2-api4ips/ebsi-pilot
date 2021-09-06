@@ -1,0 +1,199 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>eu.europa.ec.edelivery.ebsi</groupId>
+    <artifactId>ebsi-did-webadmin</artifactId>
+    <name>ebsi-did-webadmin</name>
+    <description>This is demo web admin for managing did document!</description>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>war</packaging>
+    <licenses>
+        <license>
+            <name>European Union Public Licence (EUPL)</name>
+            <url>https://joinup.ec.europa.eu/software/page/eupl</url>
+            <distribution>repo</distribution>
+            <comments>European Free/Open Source Software (F/OSS) licence</comments>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>jrc</id>
+            <name>Jože Rihtaršič</name>
+
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:svn:http://none</connection>
+        <developerConnection>scm:svn:http://none</developerConnection>
+        <url>scm:svn:http://none</url>
+    </scm>
+
+    <properties>
+        <war.final.name>ebsi-webadmin</war.final.name>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <!-- PLUGINS -->
+        <codehaus.jaxb2.plugin.version>2.5.0</codehaus.jaxb2.plugin.version>
+        <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
+        <maven.war.plugin.version>3.3.1</maven.war.plugin.version>
+
+        <org.primefaces.version>10.0.0</org.primefaces.version>
+        <ebsi-core.version>1.0-SNAPSHOT</ebsi-core.version>
+        <log4j.version>2.13.3</log4j.version>
+        <cxf-rt.version>3.3.9</cxf-rt.version>
+        <glassfish.jaxb-runtime.version>2.3.3</glassfish.jaxb-runtime.version>
+        <glassfish.jaxb-core.version>2.3.0.1</glassfish.jaxb-core.version>
+        <glassfish.jaxb-xjc.version>2.3.3</glassfish.jaxb-xjc.version>
+        <javax.activation.version>1.2.0</javax.activation.version>
+        <javax.javaee-api.version>8.0.1</javax.javaee-api.version>
+        <junit.version>4.13.1</junit.version>
+    </properties>
+
+    <!-- Where to deploy the binaries -->
+    <distributionManagement>
+        <snapshotRepository>
+            <id>cefdigital-snapshots</id>
+            <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/eDelivery-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+
+    <dependencies>
+       
+        <dependency>
+            <groupId>eu.europa.ec.edelivery.ebsi</groupId>
+            <artifactId>ebsi-core</artifactId>
+            <version>${ebsi-core.version}</version>
+        </dependency>
+    
+      
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <!-- Interceptor interface --> 
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <version>${cxf-rt.version}</version>
+        </dependency>
+        <!-- GUI uses primefaces components -->
+        <dependency>
+            <groupId>org.primefaces</groupId>
+            <artifactId>primefaces</artifactId>
+            <version>${org.primefaces.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.primefaces.extensions</groupId>
+            <artifactId>primefaces-extensions</artifactId>
+            <version>${org.primefaces.version}</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>${javax.javaee-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        
+      
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+       
+    </dependencies>
+
+    <build>
+        <finalName>${war.final.name}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>${codehaus.jaxb2.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>xjc</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <extension>true</extension>
+                    <sources>
+                        <source>${project.basedir}/src/main/resources/schemas</source>
+                    </sources>
+                    <xjbSources>
+                        <xjbSource>${project.basedir}/src/main/resources/xjb/</xjbSource>
+                    </xjbSources>
+                    <!-- set getters for boolean values -->
+                    <enableIntrospection>true</enableIntrospection>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.sun.activation</groupId>
+                        <artifactId>javax.activation</artifactId>
+                        <version>${javax.activation.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.glassfish.jaxb</groupId>
+                        <artifactId>jaxb-runtime</artifactId>
+                        <version>${glassfish.jaxb-runtime.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.glassfish.jaxb</groupId>
+                        <artifactId>jaxb-core</artifactId>
+                        <version>${glassfish.jaxb-core.version}</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.glassfish.jaxb</groupId>
+                        <artifactId>jaxb-xjc</artifactId>
+                        <version>${glassfish.jaxb-xjc.version}</version>
+                    </dependency>
+
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>${maven.war.plugin.version}</version>
+                <configuration> 
+                    <!-- for missing WEB-INF/web.xml-->
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                    <archive>                        
+                        <manifestEntries>                            
+                            <implementation-version>${project.version}</implementation-version>             
+
+                        </manifestEntries>
+                    </archive>                                 
+                </configuration>                 
+            </plugin>       
+        </plugins>
+    </build>
+</project>

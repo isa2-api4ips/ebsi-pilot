@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 (http://www.altova.com) by XMLSpy 2007 Professional Ed., Installed for 5 users (with SMP from 2007-02-06 to 2008-02-07) (CIF VSRS) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns1="http://as4mail.com/ebsi/did" targetNamespace="http://as4mail.com/ebsi/did" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="DIDDocument">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="DIDDocumentEntry" type="ns1:DIDDocumentEntryType" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="id"/>
+			<xs:attribute name="url"/>
+			<xs:attribute name="keystorePath"/>
+			<xs:attribute name="keystorePassword"/>
+			<xs:attribute name="keyAlias"/>
+			<xs:attribute name="keyPassword"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="DIDDocumentEntryType">
+		<xs:sequence>
+			<xs:element name="CertificateValue"/>
+			<xs:element name="Certificate">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Bin" type="xs:base64Binary"/>
+					</xs:sequence>
+					<xs:attribute name="subject" type="xs:string"/>
+					<xs:attribute name="issuer" type="xs:string"/>
+					<xs:attribute name="validFrom" type="xs:dateTime"/>
+					<xs:attribute name="validTo" type="xs:dateTime"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string"/>
+		<xs:attribute name="partyID" type="xs:string"/>
+		<xs:attribute name="partySchema" type="xs:string"/>
+		<xs:attribute name="didEntry" type="xs:string"/>
+		<xs:attribute name="transactionHash" type="xs:string"/>
+		<xs:attribute name="validInSeconds" type="xs:integer"/>
+	</xs:complexType>
+</xs:schema>

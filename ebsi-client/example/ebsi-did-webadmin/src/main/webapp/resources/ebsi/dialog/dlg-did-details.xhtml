@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cc="http://java.sun.com/jsf/composite"
+>
+<h:head>
+    <title>test</title>
+</h:head>
+<cc:interface>
+
+</cc:interface>
+
+<cc:implementation>
+    <h:form id="dlgFormDidDetails">
+        <p:dialog header="Create DID entry" showEffect="fade" modal="true"
+                  id="didEntryDialog" widgetVar="DidEntryDialog" responsive="true"
+                  width="950">
+            <p:growl id="dialogMessage" showDetail="true"/>
+            <p:outputPanel id="did-entry-content">
+                <p:toolbar>
+                    <p:toolbarGroup name="left" style="width: 100%;padding:0 !important; margin: 3px 0 !important;">
+
+                        <p:commandButton id="prefillDomibusBlue" value="Example: Domibus blue" icon="pi pi-cog"
+                                         action="#{ebsiWebPluginData.updateDialogDataBlue}"
+                                         styleClass="p-mr-2" process="@this">
+                        </p:commandButton>
+                        <p:commandButton id="prefillDomibusRed" value="Example: Domibus red" icon="pi pi-cog"
+                                         action="#{ebsiWebPluginData.updateDialogDataRed}"
+                                         styleClass="p-mr-2" process="@this">
+                        </p:commandButton>
+                    </p:toolbarGroup>
+                </p:toolbar>
+
+                <div class="p-shadow-2 ui-fluid p-formgrid p-grid">
+                    <h2>Certificate data</h2>
+                   <div class="p-field p-col-12">
+                        <p:outputLabel for="certificate">Upload certificate</p:outputLabel>
+                        <br/>
+                        <p:fileUpload id="certificate" listener="#{ebsiWebPluginData.handleCertificateUpload}"
+                                      mode="simple" skinSimple="true" auto="true"
+                                      update="dialogMessage" sizeLimit="100000"
+                                      allowTypes="/(\.|\/)(cert|pem|der|crt|cer)$/"/>
+                    </div>
+
+                    <div class="p-field p-col-12">
+                        <p:outputLabel for="certSubject">Certificate subject</p:outputLabel>
+                        <p:inputText id="certSubject" readonly="true"
+                                     value="#{empty ebsiWebPluginData.selectedDidEntry.certificate? '':
+                                  ebsiWebPluginData.selectedDidEntry.certificate.subject}"/>
+                    </div>
+                    <div class="p-field  p-col-12">
+                        <p:outputLabel for="certIssuer">Certificate issuer</p:outputLabel>
+                        <p:inputText id="certIssuer" readonly="true"
+                                     value="#{empty ebsiWebPluginData.selectedDidEntry.certificate? '':
+                                  ebsiWebPluginData.selectedDidEntry.certificate.issuer}"/>
+                    </div>
+
+                    <div class="p-field p-col-12 p-md-6">
+                        <p:outputLabel for="validFrom" value="Valid from:"/>
+                        <p:datePicker id="validFrom" showTime="true" readonly="true"  readonlyInput="true" style="width: 100%"
+                                      value="#{empty ebsiWebPluginData.selectedDidEntry.certificate? '':
+                                   ebsiWebPluginData.selectedDidEntry.certificate.validFrom}"/>
+                    </div>
+                    <div class="p-field p-col-12 p-md-6">
+                        <p:outputLabel for="validTo" value="Valid to:"/>
+                        <p:datePicker  id="validTo" showTime="true" readonly="true"  readonlyInput="true"  style="width: 100%"
+                                      value="#{empty ebsiWebPluginData.selectedDidEntry.certificate? ''
+                                   :ebsiWebPluginData.selectedDidEntry.certificate.validTo}"/>
+                    </div>
+
+                </div>
+
+                <div class="p-shadow-2 ui-fluid p-formgrid p-grid">
+                    <h2>Participant data</h2>
+                    <div class="p-field p-col-12">
+                        <p:outputLabel for="partySchema">Party Schema</p:outputLabel>
+                        <p:inputText id="partySchema"
+                                     value="#{empty ebsiWebPluginData.selectedDidEntry? ''
+                                   : ebsiWebPluginData.selectedDidEntry.partySchema}"
+                                     required="true"
+                        >
+                            <p:ajax event="keyup" update="dlgDidDetails:dlgFormDidDetails:generatedHash" process="@this"/>
+                        </p:inputText>
+                    </div>
+                    <div class="p-field p-col-12">
+                        <p:outputLabel for="partyId">Party Id</p:outputLabel>
+                        <p:inputText id="partyId"
+                                     value="#{empty ebsiWebPluginData.selectedDidEntry? ''
+                               :ebsiWebPluginData.selectedDidEntry.partyID}">
+                            <p:ajax event="keyup" update="dlgDidDetails:dlgFormDidDetails:generatedHash" process="@this"/>
+                        </p:inputText>
+                    </div>
+
+                    <div class="p-field p-col-12">
+                        <p:outputLabel for="validPeriod">Valid for number of days</p:outputLabel>
+                        <p:inputNumber id="validPeriod" value="#{empty ebsiWebPluginData.selectedDidEntry? ''
+                               :ebsiWebPluginData.selectedEntryValidDays}" modifyValueOnWheel="true"/>
+                    </div>
+
+                    <div class="p-field p-col-12">
+                        <p:outputLabel for="generatedHash">GeneratedHash</p:outputLabel>
+                        <p:inputText id="generatedHash" value="#{empty ebsiWebPluginData.selectedDidEntry? ''
+                               :ebsiWebPluginData.generatedHash()}" readonly="true" />
+                    </div>
+
+                </div>
+
+
+            </p:outputPanel>
+
+            <f:facet name="footer">
+                <p:commandButton id="button-create-did-entry" value="Save" icon="pi pi-check"
+                                 actionListener="#{ebsiWebPluginData.saveDidEntry}"
+                                 update="did-entry-content" process="did-entry-content @this"
+                                 onclick="PF('BlockDidEntryDialog').show()"/>
+                <p:commandButton value="Cancel" icon="pi pi-times"
+                                 onclick="PF('DidEntryDialog').hide()"
+                                 class="ui-button-secondary"/>
+            </f:facet>
+
+        </p:dialog>
+
+
+    </h:form>
+</cc:implementation>
+</html>

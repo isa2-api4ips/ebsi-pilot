@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      xmlns:dlg="http://java.sun.com/jsf/composite/ebsi/dialog"
+      lang="#{localeManager.language}"
+>
+
+<h:head>
+    <title>Domibus EBSI Pilot project</title>
+    <h:outputStylesheet name="css/primeflex.min.css"/>
+    <h:outputStylesheet name="css/ebsi-pilot.css"/>
+</h:head>
+<style type="text/css">
+    .CodeMirror {
+        height: 600px;
+    }
+</style>
+
+<h:body style="height: 100%;background: #cdcfcf;text-align: center;">
+
+    <p:panel id="page">
+
+        <div id="header">
+            <div id="headerTitle">Pilot project: Domibus with EBSI</div>
+            <div id="headerSubText">eDelivery with Blockchain tehnology.</div>
+
+        </div>
+
+
+        <p:tabView id="tabView">
+            <p:tab>
+                <f:facet name="title">
+                    <i class="pi pi-users" style="font-size: 2em"></i><h:outputText value=" DID management"/>
+                </f:facet>
+                <h:form id="tcDataform">
+                    <div class="p-shadow-2">
+                        <h1>EBSI configuration</h1>
+                        <div class="ui-fluid p-formgrid p-grid" style="margin: 5px">
+                            <div class="p-field p-col-12">
+                                <label for="ebsiUrl">EBSI DID URL:</label>
+                                <p:inputText id="ebsiUrl" type="text" value="#{ebsiWebPluginData.didDocumentURl}"
+                                             readonly="true"/>
+                            </div>
+                            <div class="p-field p-col-12 p-md-6">
+                                <label for="controlAddress">Controller address:</label>
+                                <p:inputText id="controlAddress" type="text"
+                                             value="#{ebsiWebPluginData.domainOwnerAddress}" readonly="true"/>
+                            </div>
+                            <div class="p-field p-col-12 p-md-6">
+                                <label for="didContractAddress">DID contract address:</label>
+                                <p:inputText id="didContractAddress"
+                                             type="text" value="#{ebsiWebPluginData.didSmartContractAddress}"
+                                             inputmode="" readonly="true"/>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </h:form>
+
+                <h:form id="tcTableform">
+                    <p:messages id="messages" showDetail="false" closable="true" life="4000">
+                        <p:autoUpdate/>
+                    </p:messages>
+
+                    <div class="p-shadow-2">
+                        <h1>DID Document entries</h1>
+                        <p:toolbar class="toolbar">
+                            <p:toolbarGroup name="left">
+                                <p:commandButton value="Create DID entry" icon="pi pi-user-plus"
+                                                 actionListener="#{ebsiWebPluginData.openNew}"
+                                                 update=":dlgDidDetails:dlgFormDidDetails:did-entry-content"
+                                                 oncomplete="PF('DidEntryDialog').show()"
+                                                 styleClass="p-mr-2">
+                                    <p:resetInput target=":dlgDidDetails:dlgFormDidDetails:did-entry-content"/>
+                                </p:commandButton>
+
+                                <p:commandButton id="delete-did-entry-button" value="Delete selected"
+                                                 icon="pi pi-user-minus"
+                                                 actionListener="#{ebsiWebPluginData.deleteSelectedDidEntry}"
+                                                 styleClass="p-mr-2"
+                                                 disabled="#{!ebsiWebPluginData.hasSelectedDidEntry()}"
+                                                 update="@this" onclick="PF('BlockDidEntryDialog').show()">
+                                    <p:confirm header="Confirmation" message="Delete the selected entry?"
+                                               icon="pi pi-exclamation-triangle"
+                                    ></p:confirm>
+                                </p:commandButton>
+
+                            </p:toolbarGroup>
+
+
+                            <p:toolbarGroup name="right">
+                                <p:commandButton value="Synchronize"
+                                                 icon="pi pi-refresh"
+                                                 actionListener="#{ebsiWebPluginData.synhronizeDidDocument}"
+                                                 styleClass="p-mr-2"
+                                                 update="@this" onclick="PF('BlockDidEntryDialog').show()">
+                                    <p:confirm header="Confirmation" message="Syncronize Did Document entries?"
+                                               icon="pi pi-exclamation-triangle"/>
+                                </p:commandButton>
+                                <i class="pi pi-bars p-px-2"/>
+
+                                <p:button value="Open did document" icon="pi pi-file-o"
+                                          href="#{ebsiWebPluginData.didDocumentURl}" target="_blank"
+                                          styleClass="p-mr-2">
+                                </p:button>
+
+                            </p:toolbarGroup>
+
+                        </p:toolbar>
+
+
+                        <p:dataTable id="dt-did-entries" widgetVar="dtDidEntries" var="didEntry"
+                                     value="#{ebsiWebPluginData.didDocumentEntries}"
+                                     selection="#{ebsiWebPluginData.selectedDidEntry}" rowKey="#{didEntry.id}"
+                                     scrollable="true" scrollHeight="400"
+                                     selectionMode="single" paginatorPosition="bottom"
+                                     resizableColumns="true" showGridlines="true"
+                                     style="height:500px;">
+                            <p:ajax event="rowSelect" update=":tabView:tcTableform:delete-did-entry-button"/>
+
+                            <p:column headerText="Schema" sortBy="#{didEntry.partySchema}">
+                                <h:outputText value="#{didEntry.partySchema}"/>
+                            </p:column>
+                            <p:column headerText="partyID" sortBy="#{didEntry.partyID}">
+                                <h:outputText value="#{didEntry.partyID}"/>
+                            </p:column>
+                            <p:column headerText="hash" sortBy="#{didEntry.didEntry}">
+                                <h:outputText value="#{didEntry.didEntry}"/>
+                            </p:column>
+
+
+                        </p:dataTable>
+                    </div>
+                </h:form>
+
+            </p:tab>
+            <p:tab>
+                <f:facet name="title">
+                    <i class="pi pi-send" style="font-size: 2em;color: darkblue"></i><h:outputText value=" Submit message using Domibus Blue"/>
+                </f:facet>
+                <h:form id="tcC2Sumbitform">
+                    <div class="p-shadow-2">
+                        <h1 style="background: darkblue;color: #F1F5F8">Submit message using Domibus blue</h1>
+                        <div class="ui-fluid p-formgrid p-grid" style="margin: 5px">
+
+                            <div class="p-field p-col-12">
+                                <label for="c2AdminUrl">Domibus Blue admin URL:</label>
+                                <p:inputText id="c2AdminUrl" type="text" value="#{domibusSubmitter.domibusAdminUrlC2}"
+                                             readonly="false">
+                                    <p:ajax event="blur"  process="@this" update="tabView:tcC2Sumbitform:btnDomibusC2AdminId"/>
+                                </p:inputText>
+                            </div>
+
+                            <div class="p-field p-col-12">
+                                <label for="c2Url">Domibus Blue backend URL:</label>
+
+                                <p:inputText id="c2Url" type="text" value="#{domibusSubmitter.domibusUrlC2}"
+                                             readonly="false">
+                                    <p:ajax event="blur"  process="@this"/>
+                                </p:inputText>
+                            </div>
+                        </div>
+
+                        <p:toolbar>
+                            <p:toolbarGroup name="left">
+                                <p:commandButton value="Submit" icon="pi pi-send"
+                                                 actionListener="#{domibusSubmitter.submitRequestC2}"
+                                                 styleClass="p-mr-2"
+                                                 update="@this" onclick="PF('BlockDidEntryDialog').show()">
+                                </p:commandButton>
+                                <i class="pi pi-bars p-px-2"/>
+                                <p:commandButton value="Clear"
+                                                 icon="pi pi-times-circle"
+                                                 actionListener="#{domibusSubmitter.clearRequestC2}"
+                                                 styleClass="p-mr-2"
+                                                 update=":tabView:tcC2Sumbitform">
+                                    <p:confirm header="Confirmation" message="Clear request?"
+                                               icon="pi pi-exclamation-triangle"/>
+                                </p:commandButton>
+
+                                <p:commandButton value="Reset"
+                                                 icon="pi pi-replay"
+                                                 actionListener="#{domibusSubmitter.resetRequestC2}"
+                                                 styleClass="p-mr-2"
+                                                 update=":tabView:tcC2Sumbitform">
+                                    <p:confirm header="Confirmation" message="Reset request?"
+                                               icon="pi pi-exclamation-triangle"/>
+                                </p:commandButton>
+
+                            </p:toolbarGroup>
+
+                            <p:toolbarGroup name="right">
+                                <p:button id="btnDomibusC2AdminId"
+                                            value="Domibus Blue Admin" icon="pi pi-file-o"
+                                          href="#{domibusSubmitter.domibusAdminUrlC2}" target="_blank"
+                                          styleClass="p-mr-2">
+                                </p:button>
+                            </p:toolbarGroup>
+
+                        </p:toolbar>
+                        <p:tabView id="tabViewRequestC2" activeIndex="#{domibusSubmitter.tabIndexC2}">
+                            <p:tab>
+                                <f:facet name="title">
+                                    <i class="pi pi-chevron-circle-up" style="font-size: 2em"></i><h:outputText
+                                        value=" Request"/>
+                                </f:facet>
+                                <pe:codeMirror style="font-size: 0.7em; height:500px"
+                                               id="submitSoapC2" mode="xml" theme="xq-light"
+                                               value="#{domibusSubmitter.requestC2}"
+                                               keyMap="default" lineNumbers="true"
+                                               matchBrackets="true"
+                                />
+
+                            </p:tab>
+                            <p:tab>
+                                <f:facet name="title">
+                                    <i class="pi pi-chevron-circle-down" style="font-size: 2em"></i><h:outputText
+                                        value=" Response"/>
+                                </f:facet>
+                                <pe:codeMirror style="font-size: 0.7em; height:500px"
+                                               id="submitSoapResponseC2" mode="xml" theme="xq-light"
+                                               value="#{domibusSubmitter.responseC2}"
+                                               keyMap="default" lineNumbers="true"
+                                               matchBrackets="true"
+                                />
+                            </p:tab>
+                        </p:tabView>
+                    </div>
+                </h:form>
+            </p:tab>
+            <p:tab title="Submit message to Domibus red">
+                <f:facet name="title">
+                    <i class="pi pi-send" style="font-size: 2em;color: red"></i><h:outputText value=" Submit message using Domibus Red" />
+                </f:facet>
+                <h:form id="tcC3Sumbitform">
+                    <div class="p-shadow-2">
+                        <h1 style="background: darkred;color: #FFF5F5">Submit message using Domibus Red</h1>
+                        <div class="ui-fluid p-formgrid p-grid" style="margin: 5px">
+                            <div class="p-field p-col-12">
+                                <label for="c3AdminUrl">Domibus Red admin URL:</label>
+                                <p:inputText id="c3AdminUrl" type="text" value="#{domibusSubmitter.domibusAdminUrlC3}"
+                                             readonly="false">
+                                    <p:ajax event="blur"  process="@this" update="tabView:tcC3Sumbitform:btnDomibusC3AdminId"/>
+                                </p:inputText>
+                            </div>
+
+                            <div class="p-field p-col-12">
+                                <label for="c3Url">Domibus Red backend URL:</label>
+                                <p:inputText id="c3Url" type="text" value="#{domibusSubmitter.domibusUrlC3}"
+                                             readonly="false">
+                                    <p:ajax event="blur"  process="@this"/>
+                                </p:inputText>
+                            </div>
+                        </div>
+
+                        <p:toolbar>
+                            <p:toolbarGroup name="left">
+                                <p:commandButton value="Submit" icon="pi pi-send"
+                                                 actionListener="#{domibusSubmitter.submitRequestC3}"
+                                                 styleClass="p-mr-2"
+                                                 update="@this" onclick="PF('BlockDidEntryDialog').show()">
+                                </p:commandButton>
+                                <i class="pi pi-bars p-px-2"/>
+                                <p:commandButton value="Clear"
+                                                 icon="pi pi-times-circle"
+                                                 actionListener="#{domibusSubmitter.clearRequestC3}"
+                                                 styleClass="p-mr-2"
+                                                 update=":tabView:tcC3Sumbitform">
+                                    <p:confirm header="Confirmation" message="Clear request?"
+                                               icon="pi pi-exclamation-triangle"/>
+                                </p:commandButton>
+
+                                <p:commandButton value="Reset"
+                                                 icon="pi pi-replay"
+                                                 actionListener="#{domibusSubmitter.resetRequestC3}"
+                                                 styleClass="p-mr-2"
+                                                 update=":tabView:tcC3Sumbitform">
+                                    <p:confirm header="Confirmation" message="Reset request?"
+                                               icon="pi pi-exclamation-triangle"/>
+                                </p:commandButton>
+                            </p:toolbarGroup>
+
+                            <p:toolbarGroup name="right">
+                                <p:button id="btnDomibusC3AdminId" value="Domibus Red Admin" icon="pi pi-file-o"
+                                          href="#{domibusSubmitter.domibusAdminUrlC3}" target="_blank"
+                                          styleClass="p-mr-2">
+                                </p:button>
+                            </p:toolbarGroup>
+                        </p:toolbar>
+                        <p:tabView id="tabViewRequestC3" activeIndex="#{domibusSubmitter.tabIndexC3}">
+                            <p:tab>
+                                <f:facet name="title">
+                                    <i class="pi pi-chevron-circle-up" style="font-size: 2em"></i><h:outputText
+                                        value=" Request"/>
+                                </f:facet>
+                                <pe:codeMirror style="font-size: 0.7em; height:500px"
+                                               id="submitSoapC3" mode="xml" theme="xq-light"
+                                               value="#{domibusSubmitter.requestC3}"
+                                               keyMap="default" lineNumbers="true"
+                                               matchBrackets="true"
+                                />
+
+                            </p:tab>
+                            <p:tab>
+                                <f:facet name="title">
+                                    <i class="pi pi-chevron-circle-down" style="font-size: 2em"></i><h:outputText
+                                        value=" Response"/>
+                                </f:facet>
+                                <pe:codeMirror style="font-size: 0.7em; height:500px"
+                                               id="submitSoapResponseC3" mode="xml" theme="xq-light"
+                                               value="#{domibusSubmitter.responseC3}"
+                                               keyMap="default" lineNumbers="true"
+                                               matchBrackets="true"
+                                />
+                            </p:tab>
+                        </p:tabView>
+                    </div>
+                </h:form>
+            </p:tab>
+        </p:tabView>
+
+
+        <div id="footer"><a href="">eDelivery development</a></div>
+    </p:panel>
+    <p:blockUI widgetVar="BlockDidEntryDialog"
+               block="page">
+        <div class="p-text-center">
+            <i class="pi pi-spin pi-spinner" style="font-size: 15em"></i>
+            <p style="font-size: 2em">Work in progress ...</p>
+        </div>
+    </p:blockUI>
+
+    <p:confirmDialog global="true" showEffect="fade" width="300">
+        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check"/>
+        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"
+                         icon="pi pi-times"/>
+    </p:confirmDialog>
+
+    <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false"
+              showHeader="false">
+        <div class="p-text-center">
+            <i class="pi pi-spinner loading-icon"></i>
+        </div>
+    </p:dialog>
+
+    <dlg:dlg-did-details id="dlgDidDetails"/>
+
+
+</h:body>
+</html>

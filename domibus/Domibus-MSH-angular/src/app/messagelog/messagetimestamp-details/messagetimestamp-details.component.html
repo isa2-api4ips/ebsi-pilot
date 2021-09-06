@@ -1,0 +1,91 @@
+<h2 mat-dialog-title>EBSI timestamp details</h2>
+<mat-dialog-content style="height:620px;width:750px">
+  <mat-card>
+    <mat-card-title>
+      <div *ngIf="timestampInfo.isValidSignatureHash === 'true' "
+           style="display: flex; align-items: stretch;">
+        <mat-icon style="height:1em; width:1em; flex: 0 1 auto; align-content:center;" class="green-icon">check_circle
+        </mat-icon>
+        <div
+          style="flex: 0 1 auto; padding-left: 10px; font-size: 0.8em; align-content:center;font-weight: bold; color: #0d0d0d">
+          The hash of the message signature (recomputed) matches the notarized hash.
+        </div>
+      </div>
+      <div *ngIf="timestampInfo.isValidSignatureHash === 'false' "
+           style="display: flex; align-items: stretch;">
+        <mat-icon style="height:1em; width:1em; flex: 0 1 auto; align-content:center;" class="red-icon">check_circle
+        </mat-icon>
+        <div
+          style="flex: 0 1 auto; padding-left: 10px; font-size: 0.8em; align-content:center;font-weight: bold; color: #e2334d">
+          The hash of the message signature doesn't match the notarized hash!
+        </div>
+      </div>
+    </mat-card-title>
+    <mat-card-content>
+
+
+      <mat-form-field style="width:100%; height: 60px">
+        <mat-label *ngIf="timestampInfo.isValidSignatureHash === 'true' ">
+          <span style="font-weight: bold;font-size: 1.5em;color: #0d0d0d">Signature was notarized on:</span>
+        </mat-label>
+
+        <mat-label *ngIf="timestampInfo.isValidSignatureHash === 'false' ">
+          <span style="font-weight: bold; font-size: 1.5em;color: #0d0d0d">Timestamp date:</span>
+        </mat-label>
+
+        <input matInput placeholder="Signature was notarized on:"
+               style="font-weight: bold;color: #0d0d0d"
+               value="{{timestampInfo.timestamp | domibusDate}}" readonly/>
+      </mat-form-field>
+
+      <mat-form-field style="width:100%">
+        <input matInput placeholder="Message Id:" value="{{timestampInfo.messageId}}" readonly/>
+      </mat-form-field>
+
+      <mat-form-field style="width:100%">
+        <input matInput placeholder="Notarized hash value" value="{{timestampInfo.notarizedHashValue}}" readonly/>
+      </mat-form-field>
+
+      <mat-form-field style="width:100%">
+        <input matInput placeholder="Signature hash value (recomputed)" value="{{timestampInfo.signatureHashValue}}" readonly/>
+      </mat-form-field>
+
+
+      <mat-form-field style="width:100%">
+        <input matInput placeholder="Registered by" value="{{timestampInfo.registeredBy}}" readonly/>
+      </mat-form-field>
+
+      <mat-form-field style="width:100%">
+        <input matInput placeholder="Block number" value="{{timestampInfo.blockNumber}}" readonly/>
+      </mat-form-field>
+
+      <mat-form-field style="width:100%">
+        <input matInput placeholder="Transaction hash" value="{{timestampInfo.transactionHash}}" readonly/>
+        <button mat-icon-button color="primary" button-click-behaviour
+                (click)="openURL('https://app.ebsi.xyz/besu-explorer/tx/' +timestampInfo.transactionHash)"
+                id="showLedgerTransaction_id" tooltip="Show ledger transaction">
+          <mat-icon>open_in_new</mat-icon>
+        </button>
+      </mat-form-field>
+
+
+      <mat-form-field style="width:100%">
+        <input matInput placeholder="Validation URL" value="{{timestampInfo.validationUrl}}" readonly/>
+        <button mat-icon-button color="primary" button-click-behaviour
+                (click)="openURL(timestampInfo.validationUrl)" id="showEBSITimestamp_id" tooltip="Show EBSI timestamp">
+          <mat-icon>open_in_new</mat-icon>
+        </button>
+      </mat-form-field>
+    </mat-card-content>
+  </mat-card>
+
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button id="messageLogDetailsCloseButton" mat-raised-button color="primary" (click)="dialogRef.close({})"
+          style="margin-top:10px">
+    <mat-icon>close</mat-icon>
+    <span>Close</span>
+  </button>
+</mat-dialog-actions>
+

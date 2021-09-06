@@ -1,0 +1,18 @@
+.green-icon {
+  color: green;
+  font-size: 2em;
+}
+/* Note: If you're using an SVG icon, you should make the class target the `<svg>` element */
+.green-icon svg {
+  fill: green;
+}
+
+
+.red-icon {
+  color: red;
+  font-size: 2em;
+}
+/* Note: If you're using an SVG icon, you should make the class target the `<svg>` element */
+.red-icon svg {
+  fill: red;
+}

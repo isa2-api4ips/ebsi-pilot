@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>eu.europa.ec.edelivery.ebsi</groupId>
+    <artifactId>ebsi-client</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+
+        <!-- depndency versions -->
+        <org.web3j.version>4.8.4</org.web3j.version>
+        <com.auth0.jwt.version>3.12.1</com.auth0.jwt.version>
+        <org.bouncycastle.version>1.67</org.bouncycastle.version>
+        <com.fasterxml.jackson.version>2.12.1</com.fasterxml.jackson.version>
+        <org.junit.jupiter.version>5.6.2</org.junit.jupiter.version>
+        <!-- plugin versions -->
+        <plugin.maven-compiler-plugin>3.8.1</plugin.maven-compiler-plugin>
+        <plugin.antrun.version>3.0.0</plugin.antrun.version>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${plugin.maven-compiler-plugin}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.web3j</groupId>
+                <artifactId>web3j-maven-plugin</artifactId>
+                <version>4.2.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-sources-web3j</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate-sources</goal>
+                        </goals>
+                        <configuration>
+                            <packageName>eu.europa.ec.edelivery.ebsi.contracts</packageName>
+                            <sourceDestination>${basedir}/target/generated-sources/java</sourceDestination>
+                            <soliditySourceFiles>
+                                <directory>${basedir}/src/main/resources/contracts/sol</directory>
+                                <includes>
+                                    <include>**/*.sol</include>
+                                </includes>
+                            </soliditySourceFiles>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- generate contract from JSON -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>${plugin.antrun.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-contract-wrapper</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+
+                        <configuration>
+                            <target>
+                                <java classname="org.web3j.codegen.TruffleJsonFunctionWrapperGenerator" fork="true"
+                                      failonerror="true">
+                                    <arg value="--solidityTypes"/>
+                                    <arg value="./src/main/resources/contracts/json/notaryContract.json"/>
+                                    <arg value="--package"/>
+                                    <arg value="eu.europa.ec.edelivery.ebsi.contract"/>
+                                    <arg value="--outputDir"/>
+                                    <arg value="./target/generated-sources/java/"/>
+                                    <classpath refid="maven.compile.classpath"/>
+                                </java>
+                            </target>
+                        </configuration>
+
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.web3j</groupId>
+                        <artifactId>codegen</artifactId>
+                        <version>${org.web3j.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <!-- plugin adds just generated source to compile!IIntelliJ supports the plugin and the
+            generated-sources/java folder will be marked as Source folder -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>test</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${basedir}/target/generated-sources/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>generate-contract</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+
+
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.web3j</groupId>
+            <artifactId>core</artifactId>
+            <version>${org.web3j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.web3j</groupId>
+            <artifactId>parity</artifactId>
+            <version>${org.web3j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.web3j</groupId>
+            <artifactId>crypto</artifactId>
+            <version>${org.web3j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.web3j</groupId>
+            <artifactId>abi</artifactId>
+            <version>${org.web3j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.web3j</groupId>
+            <artifactId>codegen</artifactId>
+            <version>${org.web3j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>${com.auth0.jwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>${org.bouncycastle.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk15on</artifactId>
+            <version>${org.bouncycastle.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${com.fasterxml.jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${com.fasterxml.jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${com.fasterxml.jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${org.junit.jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${org.junit.jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
