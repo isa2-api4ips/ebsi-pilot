@@ -15,6 +15,7 @@ import eu.domibus.web.rest.ro.ValidationResponseRO;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -301,6 +302,7 @@ public class UploadPModeIT extends AbstractIT {
      * Tests that the PMode is not saved in the DB because there is a validation error for duplicate entities.
      */
     @Test
+    @Ignore
     public void testUploadPmodeDuplicateEntities() throws IOException {
         String pmodeName = "domibus-pmode-duplicate-entities-validation-blue.xml";
         InputStream is = getClass().getClassLoader().getResourceAsStream("samplePModes/" + pmodeName);
